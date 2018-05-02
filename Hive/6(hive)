@@ -1,0 +1,60 @@
+CERTIFIED-WITHDRAWN	202659
+WITHDRAWN	89799
+CERTIFIED	2615623
+DENIED	94364
+
+2011:
+ERTIFIED-WITHDRAWN	11596
+WITHDRAWN	10105
+CERTIFIED	307936
+DENIED	29130
+
+create table totalcount (case_status string,total bigint)
+row format delimited                                                                                  
+fields terminated by '\t';   
+
+insert overwrite table totalcount                                                                           
+select case_status,count(*) from h1b_final group by case_status ;
+
+
+create table 2ByYear(s_no int,case_status string, employer_name string, soc_name string, job_title string, full_time_position string,prevailing_wage bigint, worksite string, longitute double, latitute double )
+partitioned by (year string)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+from h1b_final h INSERT OVERWRITE TABLE 2ByYear PARTITION(year) select h.s_no,h.case_status,h.employer_name,h.soc_name, h.job_title, h.full_time_position,h.prevailing_wage,h.worksite, h.longitute, h.latitute,h.age DISTRIBUTE by year;
+
+
+create table 6out(case_status string,year string,case_status_count int,case_status_per double)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+insert overwrite table 6out
+
+select  * from(select a.case_status,a.year,count(*) as p, round((count(*)/b.total*100),2) as cper from 2ByYear a, totalcount b where year = 2011 and a.case_status = b.case_status group by a.case_status,a.year,b.total)q1
+
+union
+
+select  * from(select a.case_status,a.year,count(*) as p, round((count(*)/b.total*100),2) as cper from 2ByYear a, totalcount b where year = 2012 and a.case_status = b.case_status group by a.case_status,a.year, b.total)q2
+
+union
+
+select  * from(select a.case_status,a.year,count(*) as p, round((count(*)/b.total*100),2) as cper from 2ByYear a, totalcount b where year = 2013 and a.case_status = b.case_status group by a.case_status,a.year, b.total)q3
+
+union
+
+select  * from(select a.case_status,a.year,count(*) as p, round((count(*)/b.total*100),2) as cper from 2ByYear a, totalcount b where year = 2014 and a.case_status = b.case_status group by a.case_status,a.year, b.total)q4
+
+union
+
+select  * from(select a.case_status,a.year,count(*) as p, round((count(*)/b.total*100),2) as cper from 2ByYear a, totalcount b where year = 2015 and a.case_status = b.case_status group by a.case_status,a.year, b.total)q5
+
+union
+
+select  * from(select a.case_status,a.year,count(*) as p, round((count(*)/b.total*100),2) as cper from 2ByYear a, totalcount b where year = 2016 and a.case_status = b.case_status group by a.case_status,a.year,b.total)q6
+
+order by year,p desc;
+
+

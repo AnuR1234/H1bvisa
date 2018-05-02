@@ -1,0 +1,101 @@
+5) Find the most popular top 10 job positions for H1B visa applications for each year?2
+a) for all the applications
+b) for only certified applications.
+
+create table 2ByYear(s_no int,case_status string, employer_name string, soc_name string, job_title string, full_time_position string,prevailing_wage bigint, worksite string, longitute double, latitute double )
+partitioned by (year string)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+
+from h1b_final h INSERT OVERWRITE TABLE 2ByYear PARTITION(year) select h.s_no,h.case_status,h.employer_name,h.soc_name, h.job_title, h.full_time_position,h.prevailing_wage,h.worksite, h.longitute, h.latitute,h.age DISTRIBUTE by year;
+
+create table 5aout(job_title string,year string,p int)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+insert overwrite table 5aout
+
+select  * from(select job_title,year,count(*) as p from 2ByYear where year = 2011 group by job_title,year order by p desc )q1
+
+union
+
+select  * from(select job_title,year,count(*) as p from 2ByYear where year = 2012 group by job_title,year order by p desc  )q2
+
+union
+
+select  * from(select job_title,year,count(*) as p from 2ByYear where year = 2013 group by job_title,year order by p desc )q3
+
+union
+
+select  * from(select job_title,year,count(*) as p from 2ByYear where year = 2014 group by job_title,year order by p desc )q4
+
+union
+
+select  * from(select job_title,year,count(*) as p from 2ByYear where year = 2015 group by job_title,year order by p desc )q5
+
+union
+
+select  * from(select job_title,year,count(*) as p from 2ByYear where year = 2016 group by job_title,year order by p desc )q6
+
+order by year,p desc; 
+
+
+select * from 5aout;
+
+op:
+
+
+PROGRAMMER ANALYST	2011	31799
+SOFTWARE ENGINEER	2011	12763
+COMPUTER PROGRAMMER	2011	8998
+SYSTEMS ANALYST	2011	8644
+BUSINESS ANALYST	2011	3891
+COMPUTER SYSTEMS ANALYST	2011	3698
+ASSISTANT PROFESSOR	2011	3467
+PHYSICAL THERAPIST	2011	3377
+SENIOR SOFTWARE ENGINEER	2011	2935
+SENIOR CONSULTANT	2011	2798
+ACCOUNTANT	2011	2628
+PROJECT MANAGER	2011	2450
+RESEARCH ASSOCIATE	2011	2448
+SOFTWARE DEVELOPER	2011	2167
+MARKET RESEARCH ANALYST	2011	2085
+CONSULTANT	2011	1998
+COMPUTER PROGRAMMER ANALYST	2011	1949
+DATABASE ADMINISTRATOR	2011	1820
+PROGRAMMER/ANALYST	2011	1573
+ASSOCIATE	2011	1475
+FINANCIAL ANALYST	2011	1460
+PHARMACIST	2011	1272
+SOFTWARE DEVELOPMENT ENGINEER IN TEST	2011	1235
+SOFTWARE DEVELOPMENT ENGINEER	2011	1197
+POSTDOCTORAL FELLOW	2011	1136
+BUSINESS SYSTEMS ANALYST	2011	1094
+MECHANICAL ENGINEER	2011	1078
+MANAGEMENT ANALYST	2011	1045
+ANALYST	2011	1037
+COMPUTER SOFTWARE ENGINEER, APPLICATIONS	2011	1018
+POSTDOCTORAL RESEARCH ASSOCIATE	2011	1007
+GRAPHIC DESIGNER	2011	990
+RESEARCH FELLOW	2011	964
+MANAGER	2011	943
+COMPUTER SOFTWARE ENGINEER	2011	927
+PROJECT ENGINEER	2011	914
+OCCUPATIONAL THERAPIST	2011	862
+POSTDOCTORAL ASSOCIATE	2011	851
+COMPUTER SYSTEMS ENGINEER	2011	844
+COMPUTER SYSTEMS ANALYSTS	2011	841
+RESEARCH SCIENTIST	2011	823
+COMPUTER PROGRAMMERS	2011	793
+PHYSICIAN	2011	793
+SYSTEMS ADMINISTRATOR	2011	791
+TEACHER	2011	772
+SENIOR PROGRAMMER ANALYST	2011	767
+ENGINEER	2011	733
+ELECTRICAL ENGINEER	2011	729
+PROCESS ENGINEER	2011	711
+DESIGN ENGINEER	2011	698
+etc...........

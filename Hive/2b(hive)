@@ -1,0 +1,55 @@
+create table 2ByYear(s_no int,case_status string, employer_name string, soc_name string, job_title string, full_time_position string,prevailing_wage bigint, worksite string, longitute double, latitute double )
+partitioned by (year string)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+from h1b_final h INSERT OVERWRITE TABLE 2ByYear PARTITION(year) select h.s_no,h.case_status,h.employer_name,h.soc_name, h.job_title, h.full_time_position,h.prevailing_wage,h.worksite, h.longitute, h.latitute,h.age DISTRIBUTE by year;
+
+create table 2bout(worksite string,year string,p int)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+insert overwrite table 2bout
+
+select  * from(select worksite,year,count(*) as p from 2ByYear where case_status = 'CERTIFIED' and year = 2011 group by year,worksite order by p desc limit 5)q1
+
+union
+
+select  * from(select worksite,year,count(*) as p from 2ByYear where case_status = 'CERTIFIED' and year = 2012 group by year,worksite order by p limit 5 )q2
+
+union
+
+select  * from(select worksite,year,count(*) as p from 2ByYear where case_status = 'CERTIFIED' and year = 2013 group by year,worksite order by p desc limit 5)q3
+
+union
+
+select  * from(select worksite,year,count(*) as p from 2ByYear where case_status = 'CERTIFIED' and year = 2014 group by year,worksite order by p desc limit 5)q4
+
+union
+
+select  * from(select worksite,year,count(*) as p from 2ByYear where  case_status = 'CERTIFIED' and year = 2015 group by year,worksite order by p desc limit 5 )q5
+
+union
+
+select  * from(select worksite,year,count(*) as p from 2ByYear where case_status = 'CERTIFIED' and year = 2016 group by year,worksite order by p desc limit 5)q6
+
+order by worksite,year desc,p desc; 
+
+sorted for all years at once:
+---------------------------------
+
+select worksite,year,p from 2bout group by year,worksite order by p desc;
+
+
+
+NEW YORK, NEW YORK	140248
+HOUSTON, TEXAS	61577
+SAN FRANCISCO, CALIFORNIA	48220
+ATLANTA, GEORGIA	36768
+SAN JOSE, CALIFORNIA	29247
+
+
+
+

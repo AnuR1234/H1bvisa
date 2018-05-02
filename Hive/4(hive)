@@ -1,0 +1,90 @@
+4)Which top 5 employers file the most petitions each year? - Case Status - ALL
+
+
+
+create table 2ByYear(s_no int,case_status string, employer_name string, soc_name string, job_title string, full_time_position string,prevailing_wage bigint, worksite string, longitute double, latitute double )
+partitioned by (year string)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+
+from h1b_final h INSERT OVERWRITE TABLE 2ByYear PARTITION(year) select h.s_no,h.case_status,h.employer_name,h.soc_name, h.job_title, h.full_time_position,h.prevailing_wage,h.worksite, h.longitute, h.latitute,h.age DISTRIBUTE by year;
+
+create table 4out(employer_name string,year string,p int)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+insert overwrite table 4out
+
+select  * from(select employer_name,year,count(*) as p from 2ByYear where year = 2011 group by employer_name,year order by p desc limit 5)q1
+
+union
+
+select  * from(select employer_name,year,count(*) as p from 2ByYear where year = 2012 group by employer_name,year order by p desc limit 5 )q2
+
+union
+
+select  * from(select employer_name,year,count(*) as p from 2ByYear where year = 2013 group by employer_name,year order by p desc limit 5)q3
+
+union
+
+select  * from(select employer_name,year,count(*) as p from 2ByYear where year = 2014 group by employer_name,year order by p desc limit 5)q4
+
+union
+
+select  * from(select employer_name,year,count(*) as p from 2ByYear where year = 2015 group by employer_name,year order by p desc limit 5)q5
+
+union
+
+select  * from(select employer_name,year,count(*) as p from 2ByYear where year = 2016 group by employer_name,year order by p desc limit 5)q6
+
+order by year,p desc; 
+
+for all years
+--------------------------------------
+
+select * from 4out;
+
+
+
+op:
+
+TATA CONSULTANCY SERVICES LIMITED	2011	5416
+MICROSOFT CORPORATION	2011	4253
+DELOITTE CONSULTING LLP	2011	3621
+WIPRO LIMITED	2011	3028
+COGNIZANT TECHNOLOGY SOLUTIONS U.S. CORPORATION	2011	2721
+
+INFOSYS LIMITED	2012	15818
+WIPRO LIMITED	2012	7182
+TATA CONSULTANCY SERVICES LIMITED	2012	6735
+DELOITTE CONSULTING LLP	2012	4727
+IBM INDIA PRIVATE LIMITED	2012	4074
+
+INFOSYS LIMITED	2013	32223
+TATA CONSULTANCY SERVICES LIMITED	2013	8790
+WIPRO LIMITED	2013	6734
+DELOITTE CONSULTING LLP	2013	6124
+ACCENTURE LLP	2013	4994
+
+INFOSYS LIMITED	2014	23759
+TATA CONSULTANCY SERVICES LIMITED	2014	14098
+WIPRO LIMITED	2014	8365
+DELOITTE CONSULTING LLP	2014	7017
+ACCENTURE LLP	2014	5498
+
+INFOSYS LIMITED	2015	33245
+TATA CONSULTANCY SERVICES LIMITED	2015	16553
+WIPRO LIMITED	2015	12201
+IBM INDIA PRIVATE LIMITED	2015	10693
+ACCENTURE LLP	2015	9605
+
+INFOSYS LIMITED	2016	25352
+CAPGEMINI AMERICA INC	2016	16725
+TATA CONSULTANCY SERVICES LIMITED	2016	13134
+WIPRO LIMITED	2016	10607
+IBM INDIA PRIVATE LIMITED	2016	9787
+
+

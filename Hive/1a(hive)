@@ -1,0 +1,76 @@
+fetching the petitions for each year for data engineers only
+----------------------------------------------------------------------
+create table avggrowth2011(year1 string,job string,p1 int)
+row format delimited
+fields terminated by '\t'
+stored as textfile;
+
+insert overwrite table avggrowth2011 select year,job_title,count(*) as p from h1b_final where LOWER(job_title) like '%data engineer%' and year = 2011 group by year,job_title;
+
+create table avggrowth2012(year2 string,job string,p2 int)
+row format delimited
+fields terminated by '\t'
+stored as textfile;
+
+insert overwrite table avggrowth2012 select year,job_title,count(*) as p from h1b_final where LOWER(job_title) like '%data engineer%' and year = 2012 group by year,job_title;
+
+create table avggrowth2013(year3 string,job string,p3 int)
+row format delimited
+fields terminated by '\t'
+stored as textfile;
+
+insert overwrite table avggrowth2013 select year,job_title,count(*) as p from h1b_final where LOWER(job_title) like '%data engineer%' and year = 2013 group by year,job_title;
+
+create table avggrowth2014(year4 string,job string,p4 int)
+row format delimited
+fields terminated by '\t'
+stored as textfile;
+
+insert overwrite table avggrowth2014 select year,job_title,count(*) as p from h1b_final where LOWER(job_title) like '%data engineer%' and year = 2014 group by year,job_title;
+
+create table avggrowth2015(year5 string,job string,p5 int)
+row format delimited
+fields terminated by '\t'
+stored as textfile;
+
+insert overwrite table avggrowth2015 select year,job_title,count(*) as p from h1b_final where LOWER(job_title) like '%data engineer%' and year = 2015 group by year,job_title;
+
+create table avggrowth2016(year6 string,job string,p6 int)
+row format delimited
+fields terminated by '\t'
+stored as textfile;
+
+insert overwrite table avggrowth2016 select year,job_title,count(*) as p from h1b_final where LOWER(job_title) like '%data engineer%' and year = 2016 group by year,job_title;
+
+annual growth for each year ((current_year-previous_year)*100/previous_year)
+--------------------------------------------------------------
+
+create table a1out(year string,totalavggrowth double)
+row format delimited
+fields terminated by '\t'
+stored as textfile;
+
+insert overwrite table a1out 
+
+select * from(select a.year1,(sum(b.p2-a.p1)*100/sum(a.p1)) as avg1 from avggrowth2011 a,avggrowth2012 b where a.job=b.job group by a.year1) q1
+union
+
+select * from(select a.year2,(sum(b.p3-a.p2)*100/sum(a.p2)) avg1 from avggrowth2012 a,avggrowth2013 b where a.job=b.job group by a.year2)q2
+
+union
+select * from(select a.year3,(sum(b.p4-a.p3)*100/sum(a.p3)) avg1 from avggrowth2013 a,avggrowth2014 b where a.job=b.job group by a.year3)q3
+
+union
+select * from(select a.year4,(sum(b.p5-a.p4)*100/sum(a.p4)) avg1 from avggrowth2014 a,avggrowth2015 b where a.job=b.job group by a.year4)q4
+
+union
+select * from(select a.year5,(sum(b.p6-a.p5)*100/sum(a.p5)) avg1 from avggrowth2015 a,avggrowth2016 b where a.job=b.job group by a.year5) q5;
+
+adding all of them and dividing by total no. of years ie 5
+-----------------------------------------------------------------------
+
+select sum(totalavggrowth)/5 as totalgrowthavgfor5years from a1out;
+
+
+
+

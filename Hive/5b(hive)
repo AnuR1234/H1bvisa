@@ -1,0 +1,100 @@
+5) Find the most popular top 10 job positions for H1B visa applications for each year?2
+a) for all the applications
+b) for only certified applications.create table 2ByYear(s_no int,case_status string, employer_name string, soc_name string, job_title string, full_time_position string,prevailing_wage bigint, worksite string, longitute double, latitute double )
+partitioned by (year string)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+
+from h1b_final h INSERT OVERWRITE TABLE 2ByYear PARTITION(year) select h.s_no,h.case_status,h.employer_name,h.soc_name, h.job_title, h.full_time_position,h.prevailing_wage,h.worksite, h.longitute, h.latitute,h.age DISTRIBUTE by year;
+
+create table 5bout(job_title string,year string,case_status string,p int)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+insert overwrite table 5bout
+
+select  * from(select job_title,year, case_status,count(*) as p from 2ByYear where year = 2011 and case_status = 'CERTIFIED' group by job_title,year,case_status order by p desc)q1
+
+union
+
+select  * from(select job_title,year,case_status,count(*) as p from 2ByYear where year = 2012 and case_status = 'CERTIFIED' group by job_title,year,case_status order by p desc )q2
+
+union
+
+select  * from(select job_title,year,case_status,count(*) as p from 2ByYear where year = 2013 and case_status = 'CERTIFIED' group by job_title,year,case_status order by p desc )q3
+
+union
+
+select  * from(select job_title,year,case_status,count(*) as p from 2ByYear where year = 2014 and case_status = 'CERTIFIED' group by job_title,year,case_status order by p desc )q4
+
+union
+
+select  * from(select job_title,year,case_status,count(*) as p from 2ByYear where year = 2015 and case_status = 'CERTIFIED' group by job_title,year,case_status order by p desc )q5
+
+union
+
+select  * from(select job_title,year,case_status,count(*) as p from 2ByYear where year = 2016 and case_status = 'CERTIFIED' group by job_title,year,case_status order by p desc )q6
+
+order by year,p desc; 
+
+
+select * from 5bout;
+
+
+op:
+
+
+PROGRAMMER ANALYST	2011	CERTIFIED	28806
+SOFTWARE ENGINEER	2011	CERTIFIED	11224
+COMPUTER PROGRAMMER	2011	CERTIFIED	8038
+SYSTEMS ANALYST	2011	CERTIFIED	7850
+BUSINESS ANALYST	2011	CERTIFIED	3444
+COMPUTER SYSTEMS ANALYST	2011	CERTIFIED	3152
+ASSISTANT PROFESSOR	2011	CERTIFIED	3050
+PHYSICAL THERAPIST	2011	CERTIFIED	2911
+SENIOR SOFTWARE ENGINEER	2011	CERTIFIED	2595
+SENIOR CONSULTANT	2011	CERTIFIED	2585
+PROJECT MANAGER	2011	CERTIFIED	2187
+RESEARCH ASSOCIATE	2011	CERTIFIED	2127
+CONSULTANT	2011	CERTIFIED	1876
+SOFTWARE DEVELOPER	2011	CERTIFIED	1875
+ACCOUNTANT	2011	CERTIFIED	1804
+COMPUTER PROGRAMMER ANALYST	2011	CERTIFIED	1766
+DATABASE ADMINISTRATOR	2011	CERTIFIED	1579
+MARKET RESEARCH ANALYST	2011	CERTIFIED	1471
+PROGRAMMER/ANALYST	2011	CERTIFIED	1364
+ASSOCIATE	2011	CERTIFIED	1324
+SOFTWARE DEVELOPMENT ENGINEER IN TEST	2011	CERTIFIED	1143
+PHARMACIST	2011	CERTIFIED	1143
+SOFTWARE DEVELOPMENT ENGINEER	2011	CERTIFIED	1111
+FINANCIAL ANALYST	2011	CERTIFIED	1083
+POSTDOCTORAL FELLOW	2011	CERTIFIED	1042
+BUSINESS SYSTEMS ANALYST	2011	CERTIFIED	945
+POSTDOCTORAL RESEARCH ASSOCIATE	2011	CERTIFIED	901
+ANALYST	2011	CERTIFIED	891
+COMPUTER SOFTWARE ENGINEER, APPLICATIONS	2011	CERTIFIED	890
+RESEARCH FELLOW	2011	CERTIFIED	860
+MECHANICAL ENGINEER	2011	CERTIFIED	844
+MANAGER	2011	CERTIFIED	836
+MANAGEMENT ANALYST	2011	CERTIFIED	793
+COMPUTER SOFTWARE ENGINEER	2011	CERTIFIED	786
+COMPUTER SYSTEMS ANALYSTS	2011	CERTIFIED	785
+COMPUTER SYSTEMS ENGINEER	2011	CERTIFIED	766
+OCCUPATIONAL THERAPIST	2011	CERTIFIED	757
+PROJECT ENGINEER	2011	CERTIFIED	755
+POSTDOCTORAL ASSOCIATE	2011	CERTIFIED	748
+RESEARCH SCIENTIST	2011	CERTIFIED	717
+GRAPHIC DESIGNER	2011	CERTIFIED	712
+SENIOR PROGRAMMER ANALYST	2011	CERTIFIED	705
+COMPUTER PROGRAMMERS	2011	CERTIFIED	704
+SYSTEMS ADMINISTRATOR	2011	CERTIFIED	701
+PHYSICIAN	2011	CERTIFIED	654
+ENGINEER	2011	CERTIFIED	639
+TEACHER	2011	CERTIFIED	628
+SENIOR SYSTEMS ANALYST	2011	CERTIFIED	622
+PROCESS ENGINEER	2011	CERTIFIED	621
+DESIGN ENGINEER	2011	CERTIFIED	616
+

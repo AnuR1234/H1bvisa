@@ -1,0 +1,24 @@
+7) Create a bar graph to depict the number of applications for each year [All]
+
+
+create table totalapplications(year string,totalcount int)
+row format delimited
+fields terminated by '\t'
+STORED AS TEXTFILE;
+
+insert overwrite table totalapplications select year,count(*) as totalcount from h1b_final group by year;
+
+select * from totalapplications;
+
+
+op:
+
+2011	358767
+2013	442114
+2015	618727
+2012	415607
+2014	519427
+2016	647803
+
+
+
